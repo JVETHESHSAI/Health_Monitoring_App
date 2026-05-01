@@ -9,3 +9,15 @@
   background: #f4f6f8;
   min-height: 100vh;
 }
+
+@media (max-width: 800px) {
+  .layout {
+    display: block;
+  }
+
+  .content {
+    margin-left: 0;
+    padding: 16px;
+    padding-top: 150px;
+  }
+}

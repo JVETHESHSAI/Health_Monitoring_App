@@ -42,6 +42,7 @@ public class MonitoringService {
         demoUser.setGender("Not set");
         demoUser.setHeight("170");
         demoUser.setWeight("65");
+        demoUser.setAllergies("None recorded");
         usersByEmail.put(demoUser.getEmail(), demoUser);
     }
 
@@ -93,6 +94,7 @@ public class MonitoringService {
         user.setGender(update.getGender());
         user.setHeight(update.getHeight());
         user.setWeight(update.getWeight());
+        user.setAllergies(update.getAllergies());
 
         if (!oldEmail.equals(user.getEmail())) {
             usersByEmail.remove(oldEmail);
@@ -204,6 +206,7 @@ public class MonitoringService {
         safe.setGender(source.getGender());
         safe.setHeight(source.getHeight());
         safe.setWeight(source.getWeight());
+        safe.setAllergies(source.getAllergies());
         safe.setProfilePic(source.getProfilePic());
         return safe;
     }

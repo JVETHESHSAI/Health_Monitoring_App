@@ -8,6 +8,7 @@ public class UserProfile {
     private String gender;
     private String height;
     private String weight;
+    private String allergies;
     private String profilePic;
 
     public UserProfile() {
@@ -73,6 +74,14 @@ public class UserProfile {
 
     public void setWeight(String weight) {
         this.weight = weight;
+    }
+
+    public String getAllergies() {
+        return allergies;
+    }
+
+    public void setAllergies(String allergies) {
+        this.allergies = allergies;
     }
 
     public String getProfilePic() {

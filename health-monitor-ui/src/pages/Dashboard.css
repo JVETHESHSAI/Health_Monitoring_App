@@ -1,167 +1,239 @@
 .dashboard-container {
-  padding: 30px;
-    max-width: 1400px;
-    margin: auto;
+  max-width: 1400px;
+  margin: auto;
+  padding: 10px;
 }
 
-/* ===== HEADER ===== */
 .dashboard-top {
+  align-items: center;
+  background: linear-gradient(135deg, #0f766e, #2563eb);
+  border-radius: 18px;
+  color: white;
+  display: flex;
+  gap: 20px;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  padding: 26px;
+}
+
+.dashboard-top h2 {
+  font-size: 30px;
+  margin: 4px 0 8px;
+}
+
+.dashboard-top p {
+  margin: 0;
+  opacity: 0.9;
+}
+
+.eyebrow {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.logout-btn {
+  background: rgba(255,255,255,0.16);
+  border: 1px solid rgba(255,255,255,0.34);
+  border-radius: 10px;
+  color: white;
+  cursor: pointer;
+  font-weight: 700;
+  padding: 11px 20px;
+}
+
+.overview-grid {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-bottom: 20px;
+}
+
+.health-card {
+  border-radius: 14px;
+  color: white;
+  min-height: 150px;
+  padding: 22px;
+  position: relative;
+  overflow: hidden;
+}
+
+.health-card::after {
+  background: rgba(255,255,255,0.16);
+  border-radius: 999px;
+  content: "";
+  height: 120px;
+  position: absolute;
+  right: -30px;
+  top: -35px;
+  width: 120px;
+}
+
+.health-card h4,
+.health-card h2,
+.health-card p,
+.card-icon {
+  position: relative;
+  z-index: 1;
+}
+
+.health-card h4 {
+  font-size: 14px;
+  margin: 12px 0 8px;
+  opacity: 0.9;
+}
+
+.health-card h2 {
+  font-size: 30px;
+  margin: 0;
+}
+
+.health-card p {
+  font-size: 13px;
+  margin: 10px 0 0;
+  opacity: 0.9;
+}
+
+.card-icon {
+  font-size: 26px;
+}
+
+.temperature-card {
+  background: linear-gradient(135deg, #ef4444, #f97316);
+}
+
+.pulse-card {
+  background: linear-gradient(135deg, #0f766e, #14b8a6);
+}
+
+.command-card {
+  background: linear-gradient(135deg, #1d4ed8, #0284c7);
+}
+
+.dashboard-grid {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: minmax(0, 1.4fr) minmax(280px, 0.6fr);
+}
+
+.panel {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  box-shadow: 0 12px 30px rgba(15,23,42,0.07);
+  padding: 22px;
+}
+
+.panel h3 {
+  margin: 0 0 8px;
+}
+
+.panel p {
+  color: #64748b;
+  margin: 0;
+}
+
+.panel-heading {
+  align-items: flex-start;
   display: flex;
   justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.panel-heading svg {
+  color: #0f766e;
+  font-size: 24px;
+}
+
+.chart-panel {
+  min-height: 380px;
+}
+
+.chart-box {
+  height: 300px;
+  margin-top: 8px;
+}
+
+.empty-chart {
   align-items: center;
-  margin-bottom: 30px;
-}
-
-/* ===== LOGOUT BUTTON ===== */
-.logout-btn {
-  background: linear-gradient(135deg, #ff4b4b, #ff7676);
-  border: none;
-  padding: 10px 22px;
-  color: white;
+  background: #f8fafc;
+  border: 1px dashed #cbd5e1;
   border-radius: 12px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: 0.3s;
-}
-
-.logout-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 15px rgba(255,0,0,0.3);
-}
-
-/* MAIN GRID */
-.main-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 25px;
-}
-
-/* PANELS */
-.left-panel,
-.right-panel {
+  color: #64748b;
   display: flex;
-  flex-direction: column;
-  gap: 20px;
+  height: 100%;
+  justify-content: center;
 }
 
-/* PROFILE PANEL */
 .profile-panel {
-  background: #5a2a64;
-  color: white;
-  padding: 20px;
-  border-radius: 20px;
   text-align: center;
 }
 
 .profile-img {
-  width: 110px;
-  height: 110px;
   border-radius: 50%;
-  margin: 15px auto;
+  height: 104px;
+  margin: 12px auto 18px;
   object-fit: cover;
+  width: 104px;
 }
 
 .profile-tiles {
   display: grid;
-  grid-template-columns: repeat(2,1fr);
   gap: 10px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .tile {
-  background: rgba(255,255,255,0.15);
-  padding: 10px;
+  background: #f8fafc;
   border-radius: 10px;
-}
-
-/* HEALTH CARDS */
-.health-card {
-  padding: 20px;
-  border-radius: 18px;
-  color: white;
-  min-height: 130px;
-}
-
-.card-icon {
-  font-size: 25px;
-  margin-bottom: 10px;
-}
-
-/* CARD COLORS */
-.blue-card { background: linear-gradient(135deg,#2ec4ff,#4facfe); }
-.red-card { background: linear-gradient(135deg,#ff416c,#ff4b2b); }
-.dark-card { background: linear-gradient(135deg,#141e30,#243b55); }
-.purple-card { background: linear-gradient(135deg,#7b4397,#dc2430); }
-.green-card { background: linear-gradient(135deg,#0f9b75,#2ed47a); }
-.orange-card { background: linear-gradient(135deg,#f59e0b,#ef4444); }
-
-/* BOTTOM SECTION */
-.bottom-section {
-  margin-top: 40px;
-  display: grid;
-  grid-template-columns: 300px 320px 1fr;
-  gap: 30px;
-}
-
-.add-record {
-  background: white;
-  padding: 20px;
-  border-radius: 15px;
-}
-
-.add-record form {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.add-record input {
-  padding: 10px;
-  border-radius: 8px;
-  border: 1px solid #ddd;
-}
-
-.add-record button {
-  background: #4CAF50;
-  border: none;
+  color: #475569;
   padding: 12px;
-  color: white;
-  border-radius: 10px;
-  cursor: pointer;
 }
 
-/* TABLE *//* ===== TABLE CARD ===== */
-.records-table {
-  background: white;
-  padding: 22px;
-  border-radius: 16px;
-  box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+.tile b {
+  color: #0f172a;
 }
 
-.status-panel {
-  min-width: 0;
-}
-
-.status-grid {
-  display: grid;
-  gap: 15px;
-  margin-top: 15px;
-}
-
-/* ===== TABLE SCROLL FIX ===== */
-.table-scroll {
-  max-height: 350px;
-  overflow-y: auto;
-  margin-top: 15px;
-}
-
-/* ===== TABLE ===== */
-table {
+.allergies-panel textarea {
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  min-height: 140px;
+  padding: 12px;
+  resize: vertical;
   width: 100%;
+}
+
+.allergies-panel button {
+  background: #0f766e;
+  border: none;
+  border-radius: 10px;
+  color: white;
+  cursor: pointer;
+  font-weight: 700;
+  margin-top: 12px;
+  padding: 12px 16px;
+  width: 100%;
+}
+
+.records-table {
+  grid-column: 1 / -1;
+}
+
+.table-scroll {
+  max-height: 360px;
+  overflow: auto;
+  margin-top: 15px;
+}
+
+table {
   border-collapse: collapse;
+  width: 100%;
 }
 
 thead th {
-  background: #4CAF50;
+  background: #0f766e;
   color: white;
   padding: 12px;
   position: sticky;
@@ -169,18 +241,56 @@ thead th {
 }
 
 td {
-  padding: 10px;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid #e2e8f0;
+  padding: 12px;
 }
 
-/* ===== RESPONSIVE ===== */
 @media (max-width: 1100px) {
-
-  .main-grid {
+  .overview-grid,
+  .dashboard-grid {
     grid-template-columns: 1fr;
   }
 
-  .bottom-section {
+  .records-table {
+    grid-column: auto;
+  }
+}
+
+@media (max-width: 700px) {
+  .dashboard-container {
+    padding: 0;
+  }
+
+  .dashboard-top {
+    align-items: flex-start;
+    border-radius: 14px;
+    flex-direction: column;
+    padding: 20px;
+  }
+
+  .dashboard-top h2 {
+    font-size: 24px;
+  }
+
+  .logout-btn {
+    width: 100%;
+  }
+
+  .health-card,
+  .panel {
+    border-radius: 12px;
+    padding: 18px;
+  }
+
+  .chart-box {
+    height: 260px;
+  }
+
+  .profile-tiles {
     grid-template-columns: 1fr;
+  }
+
+  table {
+    min-width: 560px;
   }
 }
