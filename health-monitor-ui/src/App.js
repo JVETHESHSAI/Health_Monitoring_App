@@ -32,7 +32,7 @@ function App() {
           element={<Login setIsAuthenticated={setIsAuthenticated} />}
         />
 
-        <Route path="/register" element={<Register />} />
+        <Route path="/register" element={<Register setIsAuthenticated={setIsAuthenticated} />} />
         <Route path="/dashboard" element={protectedRoute(<Dashboard />)} />
         <Route path="/profile" element={protectedRoute(<Profile />)} />
         <Route path="/notifications" element={protectedRoute(<Notifications />)} />

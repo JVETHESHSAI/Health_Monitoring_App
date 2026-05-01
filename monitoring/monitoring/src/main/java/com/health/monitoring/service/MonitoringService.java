@@ -38,14 +38,6 @@ public class MonitoringService {
         this.notificationService = notificationService;
         this.uploadDir = Path.of(uploadDir).toAbsolutePath().normalize();
         Files.createDirectories(this.uploadDir);
-
-        UserProfile demoUser = new UserProfile("Demo User", "demo@health.local", "demo123");
-        demoUser.setAge("21");
-        demoUser.setGender("Not set");
-        demoUser.setHeight("170");
-        demoUser.setWeight("65");
-        demoUser.setAllergies("None recorded");
-        usersByEmail.put(demoUser.getEmail(), demoUser);
     }
 
     public UserProfile register(UserProfile user) {

@@ -3,7 +3,7 @@ import "./Auth.css";
 import { useNavigate } from "react-router-dom";
 import { apiErrorMessage, authApi } from "../services/api";
 
-const Register = () => {
+const Register = ({ setIsAuthenticated }) => {
   const navigate = useNavigate();
 
   const [form, setForm] = useState({
@@ -22,9 +22,11 @@ const Register = () => {
     setErrorMessage("");
 
     try {
-      await authApi.register(form);
+      const res = await authApi.register(form);
+      localStorage.setItem("token", res.token);
+      setIsAuthenticated(true);
       alert("Registration Successful");
-      navigate("/login");
+      navigate("/dashboard");
     } catch (error) {
       setErrorMessage(apiErrorMessage(error, "Registration Failed"));
     }

@@ -19,16 +19,6 @@ client.interceptors.request.use((config) => {
   return config;
 });
 
-const defaultProfile = {
-  name: "Demo User",
-  email: "demo@health.local",
-  age: "",
-  gender: "",
-  height: "",
-  weight: "",
-  profilePic: ""
-};
-
 const defaultRecords = [
   {
     id: 1,
@@ -51,11 +41,6 @@ const getStoredJson = (key, fallback) => {
 
 const setStoredJson = (key, value) => {
   localStorage.setItem(key, JSON.stringify(value));
-};
-
-const isBackendUnsupported = (error) => {
-  const status = error?.response?.status;
-  return !error.response || status === 401 || status === 403 || status === 404;
 };
 
 const createId = () => {
@@ -89,72 +74,32 @@ export const imageUrl = (path) => {
 
 export const authApi = {
   async login(credentials) {
-    try {
-      const response = await client.post("/login", credentials);
-      return response.data;
-    } catch (error) {
-      if (!isBackendUnsupported(error)) throw error;
-
-      const user = getStoredJson(USER_KEY, null);
-      if (user && user.email !== credentials.email) {
-        throw error;
-      }
-
-      return {
-        token: "local-demo-token",
-        user: user || {
-          ...defaultProfile,
-          email: credentials.email || defaultProfile.email
-        }
-      };
-    }
+    const response = await client.post("/login", credentials);
+    return response.data;
   },
 
   async register(user) {
-    try {
-      const response = await client.post("/register", user);
-      return response.data;
-    } catch (error) {
-      if (!isBackendUnsupported(error)) throw error;
-
-      setStoredJson(USER_KEY, {
-        ...defaultProfile,
-        ...user
-      });
-
-      return { message: "Registration saved locally until backend APIs are added." };
-    }
+    const response = await client.post("/register", user);
+    return response.data;
   },
 
   logout() {
     localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(USER_KEY);
   }
 };
 
 export const profileApi = {
   async getProfile() {
-    try {
-      const response = await client.get("/user/profile");
-      return response.data;
-    } catch (error) {
-      if (!isBackendUnsupported(error)) throw error;
-      return getStoredJson(USER_KEY, defaultProfile);
-    }
+    const response = await client.get("/user/profile");
+    setStoredJson(USER_KEY, response.data);
+    return response.data;
   },
 
   async updateProfile(profile) {
-    try {
-      const response = await client.put("/user/profile", profile);
-      setStoredJson(USER_KEY, response.data);
-      return response.data;
-    } catch (error) {
-      if (!isBackendUnsupported(error)) throw error;
-
-      const current = getStoredJson(USER_KEY, defaultProfile);
-      const updated = { ...current, ...profile };
-      setStoredJson(USER_KEY, updated);
-      return updated;
-    }
+    const response = await client.put("/user/profile", profile);
+    setStoredJson(USER_KEY, response.data);
+    return response.data;
   },
 
   async uploadProfilePhoto(file) {
@@ -180,7 +125,6 @@ export const healthApi = {
       const response = await client.get("/health/data");
       return Array.isArray(response.data) ? response.data.map(normalizeRecord) : [];
     } catch (error) {
-      if (!isBackendUnsupported(error)) throw error;
       return getStoredJson(RECORDS_KEY, defaultRecords).map(normalizeRecord);
     }
   },
@@ -192,8 +136,6 @@ export const healthApi = {
       const response = await client.post("/health/data", payload);
       return normalizeRecord(response.data);
     } catch (error) {
-      if (!isBackendUnsupported(error)) throw error;
-
       const records = getStoredJson(RECORDS_KEY, defaultRecords).map(normalizeRecord);
       const nextRecords = [payload, ...records];
       setStoredJson(RECORDS_KEY, nextRecords);
@@ -208,7 +150,6 @@ export const alertsApi = {
       const response = await client.get("/alerts");
       return Array.isArray(response.data) ? response.data : [];
     } catch (error) {
-      if (!isBackendUnsupported(error)) throw error;
       return [];
     }
   },
