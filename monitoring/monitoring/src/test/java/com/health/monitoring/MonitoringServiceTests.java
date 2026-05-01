@@ -2,6 +2,8 @@ package com.health.monitoring;
 
 import com.health.monitoring.dto.AuthRequest;
 import com.health.monitoring.dto.PasswordRequest;
+import com.health.monitoring.model.Alert;
+import com.health.monitoring.model.HealthRecord;
 import com.health.monitoring.exception.AuthenticationException;
 import com.health.monitoring.model.UserProfile;
 import com.health.monitoring.repository.AlertRepository;
@@ -15,9 +17,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.verify;
 
 @SpringBootTest
 class MonitoringServiceTests {
@@ -121,6 +127,26 @@ class MonitoringServiceTests {
                 () -> service.register(user("Second", "same@example.com", "pass2")));
 
         assertTrue(exception.getMessage().contains("already registered"));
+    }
+
+    @Test
+    void emergencyCommandInHealthRecordCreatesAlertAndSendsEmail() {
+        HealthRecord record = new HealthRecord();
+        record.setTemperature(38.8);
+        record.setPulseValue(2400);
+        record.setCommand("E ");
+
+        HealthRecord savedRecord = service.addHealthRecord(record);
+        List<Alert> alerts = service.getAlerts();
+
+        assertEquals("E", savedRecord.getCommand());
+        assertEquals(1, alerts.size());
+        assertEquals("Emergency gesture detected", alerts.get(0).getMessage());
+        assertEquals("CRITICAL", alerts.get(0).getSeverity());
+        verify(notificationService).sendEmergencyEmail(argThat(alert ->
+                "E".equals(alert.getCommand())
+                        && "CRITICAL".equals(alert.getSeverity())
+                        && "Emergency gesture detected".equals(alert.getMessage())));
     }
 
     private UserProfile user(String name, String email, String password) {

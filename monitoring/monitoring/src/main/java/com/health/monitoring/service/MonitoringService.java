@@ -159,6 +159,7 @@ public class MonitoringService {
 
     public HealthRecord addHealthRecord(HealthRecord record) {
         record.setId(UUID.randomUUID().toString());
+        record.setCommand(normalizeCommand(record.getCommand()));
 
         if (record.getHeartRate() == null && record.getPulseValue() != null) {
             record.setHeartRate(record.getPulseValue());
@@ -172,7 +173,13 @@ public class MonitoringService {
             record.setRecordedAt(Instant.now());
         }
 
-        return healthRecordRepository.save(record);
+        HealthRecord savedRecord = healthRecordRepository.save(record);
+
+        if (isEmergencyCommand(savedRecord.getCommand())) {
+            addAlert(buildEmergencyAlert(savedRecord));
+        }
+
+        return savedRecord;
     }
 
     public List<Alert> getAlerts() {
@@ -211,6 +218,25 @@ public class MonitoringService {
 
     private String normalizeEmail(String email) {
         return email == null ? "" : email.trim().toLowerCase();
+    }
+
+    private String normalizeCommand(String command) {
+        return command == null ? null : command.trim().toUpperCase();
+    }
+
+    private boolean isEmergencyCommand(String command) {
+        return "E".equals(normalizeCommand(command));
+    }
+
+    private Alert buildEmergencyAlert(HealthRecord record) {
+        Alert alert = new Alert();
+        alert.setMessage("Emergency gesture detected");
+        alert.setTemperature(record.getTemperature());
+        alert.setPulseValue(record.getPulseValue());
+        alert.setCommand(record.getCommand());
+        alert.setSeverity("CRITICAL");
+        alert.setCreatedAt(record.getRecordedAt() == null ? Instant.now() : record.getRecordedAt());
+        return alert;
     }
 
     private String emailFromToken(String token) {
