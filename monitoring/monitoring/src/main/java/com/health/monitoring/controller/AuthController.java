@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
-import java.util.UUID;
 
 @RestController
 public class AuthController {
@@ -25,6 +24,7 @@ public class AuthController {
         UserProfile registeredUser = monitoringService.register(user);
         return ResponseEntity.ok(Map.of(
                 "message", "Registration successful",
+                "token", monitoringService.createToken(registeredUser),
                 "user", registeredUser
         ));
     }
@@ -32,6 +32,6 @@ public class AuthController {
     @PostMapping("/login")
     public AuthResponse login(@RequestBody AuthRequest request) {
         UserProfile user = monitoringService.login(request);
-        return new AuthResponse("demo-token-" + UUID.randomUUID(), user);
+        return new AuthResponse(monitoringService.createToken(user), user);
     }
 }

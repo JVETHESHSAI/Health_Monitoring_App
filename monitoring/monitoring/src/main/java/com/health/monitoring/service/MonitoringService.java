@@ -24,6 +24,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 @Service
 public class MonitoringService {
     private final Map<String, UserProfile> usersByEmail = new ConcurrentHashMap<>();
+    private final Map<String, String> emailByToken = new ConcurrentHashMap<>();
     private final List<HealthRecord> healthRecords = new CopyOnWriteArrayList<>();
     private final List<Alert> alerts = new CopyOnWriteArrayList<>();
     private final NotificationService notificationService;
@@ -72,12 +73,19 @@ public class MonitoringService {
         return safeUser(user);
     }
 
-    public UserProfile getProfile() {
-        return safeUser(getCurrentUser());
+    public String createToken(UserProfile user) {
+        String token = "demo-token-" + UUID.randomUUID();
+        emailByToken.put(token, user.getEmail());
+        return token;
     }
 
-    public UserProfile updateProfile(UserProfile update) {
-        UserProfile user = getCurrentUser();
+    public UserProfile getProfile(String token) {
+        return safeUser(getCurrentUser(token));
+    }
+
+    public UserProfile updateProfile(String token, UserProfile update) {
+        UserProfile user = getCurrentUser(token);
+        String oldEmail = user.getEmail();
 
         if (!isBlank(update.getName())) user.setName(update.getName());
         if (!isBlank(update.getEmail())) user.setEmail(update.getEmail());
@@ -86,12 +94,17 @@ public class MonitoringService {
         user.setHeight(update.getHeight());
         user.setWeight(update.getWeight());
 
+        if (!oldEmail.equals(user.getEmail())) {
+            usersByEmail.remove(oldEmail);
+            emailByToken.put(token, user.getEmail());
+        }
+
         usersByEmail.put(user.getEmail(), user);
         return safeUser(user);
     }
 
-    public void changePassword(PasswordRequest request) {
-        UserProfile user = getCurrentUser();
+    public void changePassword(String token, PasswordRequest request) {
+        UserProfile user = getCurrentUser(token);
 
         if (!isBlank(request.getOldPassword()) && !user.getPassword().equals(request.getOldPassword())) {
             throw new IllegalArgumentException("Old password is incorrect");
@@ -104,7 +117,7 @@ public class MonitoringService {
         user.setPassword(request.getNewPassword());
     }
 
-    public UserProfile uploadProfilePhoto(MultipartFile file) throws IOException {
+    public UserProfile uploadProfilePhoto(String token, MultipartFile file) throws IOException {
         if (file.isEmpty()) {
             throw new IllegalArgumentException("File is required");
         }
@@ -121,7 +134,7 @@ public class MonitoringService {
         Path target = uploadDir.resolve(filename).normalize();
         file.transferTo(target);
 
-        UserProfile user = getCurrentUser();
+        UserProfile user = getCurrentUser(token);
         user.setProfilePic(filename);
         return safeUser(user);
     }
@@ -173,14 +186,14 @@ public class MonitoringService {
         return alert;
     }
 
-    private UserProfile getCurrentUser() {
-        return usersByEmail.values().stream()
-                .findFirst()
-                .orElseGet(() -> {
-                    UserProfile user = new UserProfile("Demo User", "demo@health.local", "demo123");
-                    usersByEmail.put(user.getEmail(), user);
-                    return user;
-                });
+    private UserProfile getCurrentUser(String token) {
+        String email = emailByToken.get(token);
+
+        if (!isBlank(email) && usersByEmail.containsKey(email)) {
+            return usersByEmail.get(email);
+        }
+
+        throw new IllegalArgumentException("Invalid or missing login token");
     }
 
     private UserProfile safeUser(UserProfile source) {
