@@ -1,9 +1,19 @@
 package com.health.monitoring.model;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
 import java.time.Instant;
 
+@Entity
+@Table(name = "alerts")
 public class Alert {
+    @Id
     private String id;
+
+    @Column(length = 1000)
     private String message;
     private Double temperature;
     private Integer pulseValue;

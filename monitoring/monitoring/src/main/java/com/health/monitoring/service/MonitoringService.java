@@ -6,7 +6,12 @@ import com.health.monitoring.exception.AuthenticationException;
 import com.health.monitoring.model.Alert;
 import com.health.monitoring.model.HealthRecord;
 import com.health.monitoring.model.UserProfile;
+import com.health.monitoring.repository.AlertRepository;
+import com.health.monitoring.repository.HealthRecordRepository;
+import com.health.monitoring.repository.UserProfileRepository;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -14,28 +19,32 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.Base64;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 @Service
 public class MonitoringService {
-    private final Map<String, UserProfile> usersByEmail = new ConcurrentHashMap<>();
     private final Map<String, String> emailByToken = new ConcurrentHashMap<>();
-    private final List<HealthRecord> healthRecords = new CopyOnWriteArrayList<>();
-    private final List<Alert> alerts = new CopyOnWriteArrayList<>();
+    private final UserProfileRepository userProfileRepository;
+    private final HealthRecordRepository healthRecordRepository;
+    private final AlertRepository alertRepository;
     private final NotificationService notificationService;
+    private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     private final Path uploadDir;
 
     public MonitoringService(
             @Value("${app.upload-dir:uploads}") String uploadDir,
-            NotificationService notificationService) throws IOException {
+            NotificationService notificationService,
+            UserProfileRepository userProfileRepository,
+            HealthRecordRepository healthRecordRepository,
+            AlertRepository alertRepository) throws IOException {
         this.notificationService = notificationService;
+        this.userProfileRepository = userProfileRepository;
+        this.healthRecordRepository = healthRecordRepository;
+        this.alertRepository = alertRepository;
         this.uploadDir = Path.of(uploadDir).toAbsolutePath().normalize();
         Files.createDirectories(this.uploadDir);
     }
@@ -47,7 +56,7 @@ public class MonitoringService {
             throw new IllegalArgumentException("Email and password are required");
         }
 
-        if (usersByEmail.containsKey(user.getEmail())) {
+        if (userProfileRepository.existsById(user.getEmail())) {
             throw new IllegalArgumentException("Email is already registered");
         }
 
@@ -55,19 +64,19 @@ public class MonitoringService {
             user.setName(user.getEmail());
         }
 
-        usersByEmail.put(user.getEmail(), user);
-        return safeUser(user);
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        return safeUser(userProfileRepository.save(user));
     }
 
     public UserProfile login(AuthRequest request) {
         String email = normalizeEmail(request.getEmail());
-        UserProfile user = usersByEmail.get(email);
+        UserProfile user = userProfileRepository.findById(email).orElse(null);
 
         if (user == null) {
             throw new AuthenticationException("Email is not registered");
         }
 
-        if (!user.getPassword().equals(request.getPassword())) {
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new AuthenticationException("Incorrect password");
         }
 
@@ -100,18 +109,17 @@ public class MonitoringService {
         user.setAllergies(update.getAllergies());
 
         if (!oldEmail.equals(user.getEmail())) {
-            usersByEmail.remove(oldEmail);
+            userProfileRepository.deleteById(oldEmail);
             emailByToken.put(token, user.getEmail());
         }
 
-        usersByEmail.put(user.getEmail(), user);
-        return safeUser(user);
+        return safeUser(userProfileRepository.save(user));
     }
 
     public void changePassword(String token, PasswordRequest request) {
         UserProfile user = getCurrentUser(token);
 
-        if (!isBlank(request.getOldPassword()) && !user.getPassword().equals(request.getOldPassword())) {
+        if (!isBlank(request.getOldPassword()) && !passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
             throw new IllegalArgumentException("Old password is incorrect");
         }
 
@@ -119,7 +127,8 @@ public class MonitoringService {
             throw new IllegalArgumentException("New password is required");
         }
 
-        user.setPassword(request.getNewPassword());
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        userProfileRepository.save(user);
     }
 
     public UserProfile uploadProfilePhoto(String token, MultipartFile file) throws IOException {
@@ -141,13 +150,11 @@ public class MonitoringService {
 
         UserProfile user = getCurrentUser(token);
         user.setProfilePic(filename);
-        return safeUser(user);
+        return safeUser(userProfileRepository.save(user));
     }
 
     public List<HealthRecord> getHealthRecords() {
-        List<HealthRecord> sorted = new ArrayList<>(healthRecords);
-        sorted.sort(Comparator.comparing(HealthRecord::getRecordedAt).reversed());
-        return sorted;
+        return healthRecordRepository.findAllByOrderByRecordedAtDesc();
     }
 
     public HealthRecord addHealthRecord(HealthRecord record) {
@@ -165,14 +172,11 @@ public class MonitoringService {
             record.setRecordedAt(Instant.now());
         }
 
-        healthRecords.add(record);
-        return record;
+        return healthRecordRepository.save(record);
     }
 
     public List<Alert> getAlerts() {
-        List<Alert> sorted = new ArrayList<>(alerts);
-        sorted.sort(Comparator.comparing(Alert::getCreatedAt).reversed());
-        return sorted;
+        return alertRepository.findAllByOrderByCreatedAtDesc();
     }
 
     public Alert addAlert(Alert alert) {
@@ -187,8 +191,7 @@ public class MonitoringService {
         }
 
         notificationService.sendEmergencyEmail(alert);
-        alerts.add(alert);
-        return alert;
+        return alertRepository.save(alert);
     }
 
     private UserProfile getCurrentUser(String token) {
@@ -198,8 +201,9 @@ public class MonitoringService {
             email = emailFromToken(token);
         }
 
-        if (!isBlank(email) && usersByEmail.containsKey(email)) {
-            return usersByEmail.get(email);
+        if (!isBlank(email)) {
+            return userProfileRepository.findById(email)
+                    .orElseThrow(() -> new IllegalArgumentException("Invalid or missing login token"));
         }
 
         throw new IllegalArgumentException("Invalid or missing login token");

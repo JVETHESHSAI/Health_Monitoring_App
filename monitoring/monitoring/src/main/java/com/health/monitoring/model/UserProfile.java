@@ -1,14 +1,30 @@
 package com.health.monitoring.model;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name = "users")
 public class UserProfile {
-    private String name;
+    @Id
+    @Column(nullable = false, unique = true)
     private String email;
+
+    private String name;
+
+    @Column(nullable = false)
     private String password;
+
     private String age;
     private String gender;
     private String height;
     private String weight;
+
+    @Column(length = 1000)
     private String allergies;
+
     private String profilePic;
 
     public UserProfile() {

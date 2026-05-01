@@ -1,8 +1,15 @@
 package com.health.monitoring.model;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
 import java.time.Instant;
 
+@Entity
+@Table(name = "health_records")
 public class HealthRecord {
+    @Id
     private String id;
     private Double temperature;
     private Integer pulseValue;
