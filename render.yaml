@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: health-monitoring-backend
+    runtime: docker
+    repo: https://github.com/JVETHESHSAI/Health_Monitoring_App
+    branch: main
+    rootDir: monitoring/monitoring
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: ALERT_EMAIL_ENABLED
+        value: "false"
