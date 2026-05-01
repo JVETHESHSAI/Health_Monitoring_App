@@ -1,0 +1,17 @@
+node_modules/
+build/
+target/
+uploads/
+*.zip
+*.log
+
+.env
+.env.local
+.env.*.local
+
+.idea/
+.settings/
+.classpath
+.project
+
+**/.git-local-backup/

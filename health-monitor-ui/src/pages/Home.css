@@ -1,0 +1,63 @@
+/* ===== FULL PAGE ===== */
+.home-container {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(120deg, #0c7f9c, #00f2fe);
+}
+
+/* ===== CARD ===== */
+.home-card {
+  background: white;
+  padding: 50px;
+  border-radius: 20px;
+  text-align: center;
+  width: 420px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+}
+
+.home-card h1 {
+  margin-bottom: 15px;
+  color: #333;
+}
+
+.home-card p {
+  color: #666;
+  margin-bottom: 30px;
+}
+
+/* ===== BUTTONS ===== */
+.home-buttons {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+}
+
+.login-btn {
+  background: #4CAF50;
+  border: none;
+  padding: 12px 25px;
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 15px;
+}
+
+.register-btn {
+  background: #2196F3;
+  border: none;
+  padding: 12px 25px;
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 15px;
+}
+
+.login-btn:hover {
+  background: #45a049;
+}
+
+.register-btn:hover {
+  background: #1e88e5;
+}

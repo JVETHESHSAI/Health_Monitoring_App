@@ -1,0 +1,186 @@
+.dashboard-container {
+  padding: 30px;
+    max-width: 1400px;
+    margin: auto;
+}
+
+/* ===== HEADER ===== */
+.dashboard-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+/* ===== LOGOUT BUTTON ===== */
+.logout-btn {
+  background: linear-gradient(135deg, #ff4b4b, #ff7676);
+  border: none;
+  padding: 10px 22px;
+  color: white;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.3s;
+}
+
+.logout-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(255,0,0,0.3);
+}
+
+/* MAIN GRID */
+.main-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 25px;
+}
+
+/* PANELS */
+.left-panel,
+.right-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* PROFILE PANEL */
+.profile-panel {
+  background: #5a2a64;
+  color: white;
+  padding: 20px;
+  border-radius: 20px;
+  text-align: center;
+}
+
+.profile-img {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  margin: 15px auto;
+  object-fit: cover;
+}
+
+.profile-tiles {
+  display: grid;
+  grid-template-columns: repeat(2,1fr);
+  gap: 10px;
+}
+
+.tile {
+  background: rgba(255,255,255,0.15);
+  padding: 10px;
+  border-radius: 10px;
+}
+
+/* HEALTH CARDS */
+.health-card {
+  padding: 20px;
+  border-radius: 18px;
+  color: white;
+  min-height: 130px;
+}
+
+.card-icon {
+  font-size: 25px;
+  margin-bottom: 10px;
+}
+
+/* CARD COLORS */
+.blue-card { background: linear-gradient(135deg,#2ec4ff,#4facfe); }
+.red-card { background: linear-gradient(135deg,#ff416c,#ff4b2b); }
+.dark-card { background: linear-gradient(135deg,#141e30,#243b55); }
+.purple-card { background: linear-gradient(135deg,#7b4397,#dc2430); }
+.green-card { background: linear-gradient(135deg,#0f9b75,#2ed47a); }
+.orange-card { background: linear-gradient(135deg,#f59e0b,#ef4444); }
+
+/* BOTTOM SECTION */
+.bottom-section {
+  margin-top: 40px;
+  display: grid;
+  grid-template-columns: 300px 320px 1fr;
+  gap: 30px;
+}
+
+.add-record {
+  background: white;
+  padding: 20px;
+  border-radius: 15px;
+}
+
+.add-record form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.add-record input {
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}
+
+.add-record button {
+  background: #4CAF50;
+  border: none;
+  padding: 12px;
+  color: white;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+/* TABLE *//* ===== TABLE CARD ===== */
+.records-table {
+  background: white;
+  padding: 22px;
+  border-radius: 16px;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+}
+
+.status-panel {
+  min-width: 0;
+}
+
+.status-grid {
+  display: grid;
+  gap: 15px;
+  margin-top: 15px;
+}
+
+/* ===== TABLE SCROLL FIX ===== */
+.table-scroll {
+  max-height: 350px;
+  overflow-y: auto;
+  margin-top: 15px;
+}
+
+/* ===== TABLE ===== */
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+thead th {
+  background: #4CAF50;
+  color: white;
+  padding: 12px;
+  position: sticky;
+  top: 0;
+}
+
+td {
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1100px) {
+
+  .main-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .bottom-section {
+    grid-template-columns: 1fr;
+  }
+}
