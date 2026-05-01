@@ -19,16 +19,7 @@ client.interceptors.request.use((config) => {
   return config;
 });
 
-const defaultRecords = [
-  {
-    id: 1,
-    heartRate: 78,
-    temperature: 36.8,
-    spo2: 98,
-    bp: "120/80",
-    recordedAt: new Date().toISOString()
-  }
-];
+const defaultRecords = [];
 
 const getStoredJson = (key, fallback) => {
   try {
