@@ -45,10 +45,15 @@ const createId = () => {
 
 const normalizeRecord = (record) => ({
   id: record.id || createId(),
+  command: typeof record.command === "string" ? record.command.trim().toUpperCase() : "",
   heartRate: record.heartRate ?? record.heart_rate ?? "",
+  pulseValue: record.pulseValue ?? record.pulse_value ?? record.heartRate ?? record.heart_rate ?? "",
   temperature: record.temperature ?? "",
   spo2: record.spo2 ?? record.spO2 ?? "",
   bp: record.bp ?? record.bloodPressure ?? "",
+  accX: record.accX ?? record.acc_x ?? "",
+  accY: record.accY ?? record.acc_y ?? "",
+  accZ: record.accZ ?? record.acc_z ?? "",
   recordedAt: record.recordedAt ?? record.createdAt ?? new Date().toISOString()
 });
 
