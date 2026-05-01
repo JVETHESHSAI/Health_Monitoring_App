@@ -141,6 +141,7 @@ export const profileApi = {
   async updateProfile(profile) {
     try {
       const response = await client.put("/user/profile", profile);
+      setStoredJson(USER_KEY, response.data);
       return response.data;
     } catch (error) {
       if (!isBackendUnsupported(error)) throw error;
@@ -157,6 +158,7 @@ export const profileApi = {
     formData.append("file", file);
 
     const response = await client.post("/user/profile/upload", formData);
+    setStoredJson(USER_KEY, response.data);
     return response.data;
   },
 

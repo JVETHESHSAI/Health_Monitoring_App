@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import Layout from "../components/Layout";
 import "./Profile.css";
 import { imageUrl, profileApi } from "../services/api";
@@ -6,31 +6,37 @@ import { imageUrl, profileApi } from "../services/api";
 const Profile = () => {
   const [profile, setProfile] = useState({});
   const [form, setForm] = useState({
+    name: "",
+    email: "",
     age: "",
     gender: "",
     height: "",
-    weight: ""
+    weight: "",
+    allergies: ""
   });
   const [file, setFile] = useState(null);
 
-  const fetchProfile = useCallback(async () => {
+  useEffect(() => {
+    fetchProfile();
+  }, []);
+
+  const fetchProfile = async () => {
     try {
       const data = await profileApi.getProfile();
       setProfile(data);
       setForm({
+        name: data.name || "",
+        email: data.email || "",
         age: data.age || "",
         gender: data.gender || "",
         height: data.height || "",
-        weight: data.weight || ""
+        weight: data.weight || "",
+        allergies: data.allergies || ""
       });
     } catch (error) {
       console.log(error);
     }
-  }, []);
-
-  useEffect(() => {
-    fetchProfile();
-  }, [fetchProfile]);
+  };
 
   const handleChange = (e) => {
     setForm({
@@ -43,9 +49,9 @@ const Profile = () => {
     e.preventDefault();
 
     try {
-      await profileApi.updateProfile(form);
+      const updated = await profileApi.updateProfile(form);
+      setProfile(updated);
       alert("Profile Updated Successfully");
-      fetchProfile();
     } catch (error) {
       alert("Update Failed");
     }
@@ -62,73 +68,104 @@ const Profile = () => {
     }
 
     try {
-      await profileApi.uploadProfilePhoto(file);
+      const updated = await profileApi.uploadProfilePhoto(file);
+      setProfile(updated);
       alert("Photo Uploaded Successfully");
-      fetchProfile();
     } catch (error) {
       console.log(error);
-      alert("Photo upload is not available until the backend exposes /user/profile/upload");
+      alert("Upload Failed");
     }
   };
 
   return (
     <Layout>
       <div className="profile-wrapper">
-        <div className="profile-card">
-          <h2>My Profile</h2>
-
-          {profile.profilePic && (
-            <img
-              src={imageUrl(profile.profilePic)}
-              alt="Profile"
-              className="profile-img"
-            />
-          )}
-
-          <p><b>Name:</b> {profile.name || "-"}</p>
-          <p><b>Email:</b> {profile.email || "-"}</p>
-
-          <div className="upload-section">
-            <input type="file" onChange={handleFileChange} />
-            <button onClick={handleUpload}>Upload Photo</button>
+        <section className="profile-hero">
+          <div>
+            <p className="profile-kicker">Care profile</p>
+            <h2>{profile.name || "My Profile"}</h2>
+            <p>{profile.email || "Keep user details accurate for caregivers."}</p>
           </div>
-        </div>
 
-        <div className="profile-card">
-          <h3>Update Health Details</h3>
+          <div className="profile-avatar">
+            {profile.profilePic ? (
+              <img src={imageUrl(profile.profilePic)} alt="Profile" />
+            ) : (
+              <span>{(profile.name || "U").charAt(0).toUpperCase()}</span>
+            )}
+          </div>
+        </section>
+
+        <section className="profile-card">
+          <h3>Update Details</h3>
 
           <form onSubmit={handleUpdate} className="profile-form">
-            <input
-              name="age"
-              placeholder="Age"
-              value={form.age}
-              onChange={handleChange}
-            />
+            <div className="form-grid">
+              <input
+                name="name"
+                placeholder="Full Name"
+                value={form.name}
+                onChange={handleChange}
+              />
 
-            <input
-              name="gender"
-              placeholder="Gender"
-              value={form.gender}
-              onChange={handleChange}
-            />
+              <input
+                name="email"
+                placeholder="Email"
+                value={form.email}
+                onChange={handleChange}
+              />
 
-            <input
-              name="height"
-              placeholder="Height (cm)"
-              value={form.height}
-              onChange={handleChange}
-            />
+              <input
+                name="age"
+                placeholder="Age"
+                value={form.age}
+                onChange={handleChange}
+              />
 
-            <input
-              name="weight"
-              placeholder="Weight (kg)"
-              value={form.weight}
+              <input
+                name="gender"
+                placeholder="Gender"
+                value={form.gender}
+                onChange={handleChange}
+              />
+
+              <input
+                name="height"
+                placeholder="Height (cm)"
+                value={form.height}
+                onChange={handleChange}
+              />
+
+              <input
+                name="weight"
+                placeholder="Weight (kg)"
+                value={form.weight}
+                onChange={handleChange}
+              />
+            </div>
+
+            <textarea
+              name="allergies"
+              placeholder="Allergies or emergency notes"
+              value={form.allergies}
               onChange={handleChange}
             />
 
             <button type="submit">Update Profile</button>
           </form>
-        </div>
+        </section>
+
+        <section className="profile-card upload-card">
+          <div>
+            <h3>Profile Photo</h3>
+            <p>Upload a clear photo so caregivers can identify the user quickly.</p>
+          </div>
+
+          <div className="upload-section">
+            <input type="file" accept="image/*" onChange={handleFileChange} />
+            <button type="button" onClick={handleUpload}>Upload Photo</button>
+          </div>
+        </section>
       </div>
     </Layout>
   );

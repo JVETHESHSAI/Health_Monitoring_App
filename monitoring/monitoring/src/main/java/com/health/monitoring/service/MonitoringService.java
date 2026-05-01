@@ -14,6 +14,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -75,7 +76,10 @@ public class MonitoringService {
     }
 
     public String createToken(UserProfile user) {
-        String token = "demo-token-" + UUID.randomUUID();
+        String encodedEmail = Base64.getUrlEncoder()
+                .withoutPadding()
+                .encodeToString(user.getEmail().getBytes());
+        String token = "demo-token-" + encodedEmail + "-" + UUID.randomUUID();
         emailByToken.put(token, user.getEmail());
         return token;
     }
@@ -191,11 +195,35 @@ public class MonitoringService {
     private UserProfile getCurrentUser(String token) {
         String email = emailByToken.get(token);
 
+        if (isBlank(email)) {
+            email = emailFromToken(token);
+        }
+
         if (!isBlank(email) && usersByEmail.containsKey(email)) {
             return usersByEmail.get(email);
         }
 
         throw new IllegalArgumentException("Invalid or missing login token");
+    }
+
+    private String emailFromToken(String token) {
+        if (isBlank(token) || !token.startsWith("demo-token-")) {
+            return "";
+        }
+
+        String tokenBody = token.substring("demo-token-".length());
+        int lastDashIndex = tokenBody.lastIndexOf('-');
+
+        if (lastDashIndex <= 0) {
+            return "";
+        }
+
+        try {
+            byte[] decoded = Base64.getUrlDecoder().decode(tokenBody.substring(0, lastDashIndex));
+            return new String(decoded);
+        } catch (IllegalArgumentException exception) {
+            return "";
+        }
     }
 
     private UserProfile safeUser(UserProfile source) {
