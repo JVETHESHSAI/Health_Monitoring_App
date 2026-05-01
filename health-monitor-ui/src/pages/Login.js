@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "./Auth.css";
 import { useNavigate } from "react-router-dom";
-import { authApi } from "../services/api";
+import { apiErrorMessage, authApi } from "../services/api";
 
 const Login = ({ setIsAuthenticated }) => {
   const navigate = useNavigate();
@@ -10,6 +10,7 @@ const Login = ({ setIsAuthenticated }) => {
     email: "",
     password: ""
   });
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -17,6 +18,7 @@ const Login = ({ setIsAuthenticated }) => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    setErrorMessage("");
 
     try {
       const res = await authApi.login(form);
@@ -25,7 +27,7 @@ const Login = ({ setIsAuthenticated }) => {
       navigate("/dashboard");
     } catch (error) {
       console.log(error);
-      alert("Invalid Credentials");
+      setErrorMessage(apiErrorMessage(error, "Invalid credentials"));
     }
   };
 
@@ -50,6 +52,8 @@ const Login = ({ setIsAuthenticated }) => {
         />
 
         <button type="submit">Login</button>
+
+        {errorMessage && <p className="auth-error">{errorMessage}</p>}
 
         <p>
           New user?{" "}

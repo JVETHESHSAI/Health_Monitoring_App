@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "./Auth.css";
 import { useNavigate } from "react-router-dom";
-import { authApi } from "../services/api";
+import { apiErrorMessage, authApi } from "../services/api";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -11,6 +11,7 @@ const Register = () => {
     email: "",
     password: ""
   });
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -18,13 +19,14 @@ const Register = () => {
 
   const handleRegister = async (e) => {
     e.preventDefault();
+    setErrorMessage("");
 
     try {
       await authApi.register(form);
       alert("Registration Successful");
       navigate("/login");
-    } catch {
-      alert("Registration Failed");
+    } catch (error) {
+      setErrorMessage(apiErrorMessage(error, "Registration Failed"));
     }
   };
 
@@ -56,6 +58,8 @@ const Register = () => {
         />
 
         <button type="submit">Register</button>
+
+        {errorMessage && <p className="auth-error">{errorMessage}</p>}
 
         <p>
           Already have account?{" "}

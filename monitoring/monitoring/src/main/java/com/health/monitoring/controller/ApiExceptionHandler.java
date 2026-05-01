@@ -1,5 +1,6 @@
 package com.health.monitoring.controller;
 
+import com.health.monitoring.exception.AuthenticationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -17,6 +18,12 @@ public class ApiExceptionHandler {
                 ? HttpStatus.UNAUTHORIZED
                 : HttpStatus.BAD_REQUEST;
         return ResponseEntity.status(status).body(Map.of("message", exception.getMessage()));
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<Map<String, String>> handleAuthentication(AuthenticationException exception) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(Map.of("message", exception.getMessage()));
     }
 
     @ExceptionHandler(IOException.class)

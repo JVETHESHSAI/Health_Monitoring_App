@@ -2,6 +2,7 @@ package com.health.monitoring.service;
 
 import com.health.monitoring.dto.AuthRequest;
 import com.health.monitoring.dto.PasswordRequest;
+import com.health.monitoring.exception.AuthenticationException;
 import com.health.monitoring.model.Alert;
 import com.health.monitoring.model.HealthRecord;
 import com.health.monitoring.model.UserProfile;
@@ -48,8 +49,14 @@ public class MonitoringService {
     }
 
     public UserProfile register(UserProfile user) {
+        user.setEmail(normalizeEmail(user.getEmail()));
+
         if (isBlank(user.getEmail()) || isBlank(user.getPassword())) {
             throw new IllegalArgumentException("Email and password are required");
+        }
+
+        if (usersByEmail.containsKey(user.getEmail())) {
+            throw new IllegalArgumentException("Email is already registered");
         }
 
         if (isBlank(user.getName())) {
@@ -61,15 +68,15 @@ public class MonitoringService {
     }
 
     public UserProfile login(AuthRequest request) {
-        UserProfile user = usersByEmail.get(request.getEmail());
+        String email = normalizeEmail(request.getEmail());
+        UserProfile user = usersByEmail.get(email);
 
         if (user == null) {
-            user = new UserProfile(request.getEmail(), request.getEmail(), request.getPassword());
-            usersByEmail.put(user.getEmail(), user);
+            throw new AuthenticationException("Email is not registered");
         }
 
         if (!user.getPassword().equals(request.getPassword())) {
-            throw new IllegalArgumentException("Invalid credentials");
+            throw new AuthenticationException("Incorrect password");
         }
 
         return safeUser(user);
@@ -93,7 +100,7 @@ public class MonitoringService {
         String oldEmail = user.getEmail();
 
         if (!isBlank(update.getName())) user.setName(update.getName());
-        if (!isBlank(update.getEmail())) user.setEmail(update.getEmail());
+        if (!isBlank(update.getEmail())) user.setEmail(normalizeEmail(update.getEmail()));
         user.setAge(update.getAge());
         user.setGender(update.getGender());
         user.setHeight(update.getHeight());
@@ -204,6 +211,10 @@ public class MonitoringService {
         }
 
         throw new IllegalArgumentException("Invalid or missing login token");
+    }
+
+    private String normalizeEmail(String email) {
+        return email == null ? "" : email.trim().toLowerCase();
     }
 
     private String emailFromToken(String token) {
