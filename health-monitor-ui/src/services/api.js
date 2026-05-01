@@ -1,12 +1,13 @@
 import axios from "axios";
 
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "http://localhost:8080";
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "https://health-monitoring-app-3.onrender.com";
 const TOKEN_KEY = "token";
 const USER_KEY = "health-monitor-user";
 const RECORDS_KEY = "health-monitor-records";
 
 const client = axios.create({
-  baseURL: API_BASE_URL
+  baseURL: API_BASE_URL,
+  timeout: 60000
 });
 
 client.interceptors.request.use((config) => {
@@ -54,6 +55,14 @@ const normalizeRecord = (record) => ({
 export const apiBaseUrl = API_BASE_URL;
 
 export const apiErrorMessage = (error, fallback = "Something went wrong") => {
+  if (error?.code === "ECONNABORTED") {
+    return "The backend is taking too long to respond. Please wait one minute and try again.";
+  }
+
+  if (error?.message === "Network Error") {
+    return "Cannot reach the backend server. Please check that the backend is deployed and awake.";
+  }
+
   return error?.response?.data?.message || error?.message || fallback;
 };
 

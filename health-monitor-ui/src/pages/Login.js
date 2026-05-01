@@ -11,6 +11,7 @@ const Login = ({ setIsAuthenticated }) => {
     password: ""
   });
   const [errorMessage, setErrorMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -19,6 +20,7 @@ const Login = ({ setIsAuthenticated }) => {
   const handleLogin = async (e) => {
     e.preventDefault();
     setErrorMessage("");
+    setIsSubmitting(true);
 
     try {
       const res = await authApi.login(form);
@@ -28,6 +30,8 @@ const Login = ({ setIsAuthenticated }) => {
     } catch (error) {
       console.log(error);
       setErrorMessage(apiErrorMessage(error, "Invalid credentials"));
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -51,7 +55,13 @@ const Login = ({ setIsAuthenticated }) => {
           required
         />
 
-        <button type="submit">Login</button>
+        <button type="submit" disabled={isSubmitting}>
+          {isSubmitting ? "Connecting..." : "Login"}
+        </button>
+
+        {isSubmitting && (
+          <p className="auth-help">Free backend may take up to one minute to wake up.</p>
+        )}
 
         {errorMessage && <p className="auth-error">{errorMessage}</p>}
 

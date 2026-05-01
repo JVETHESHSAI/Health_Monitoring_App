@@ -12,6 +12,7 @@ const Register = ({ setIsAuthenticated }) => {
     password: ""
   });
   const [errorMessage, setErrorMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -20,15 +21,17 @@ const Register = ({ setIsAuthenticated }) => {
   const handleRegister = async (e) => {
     e.preventDefault();
     setErrorMessage("");
+    setIsSubmitting(true);
 
     try {
       const res = await authApi.register(form);
       localStorage.setItem("token", res.token);
       setIsAuthenticated(true);
-      alert("Registration Successful");
       navigate("/dashboard");
     } catch (error) {
       setErrorMessage(apiErrorMessage(error, "Registration Failed"));
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -59,7 +62,13 @@ const Register = ({ setIsAuthenticated }) => {
           required
         />
 
-        <button type="submit">Register</button>
+        <button type="submit" disabled={isSubmitting}>
+          {isSubmitting ? "Creating account..." : "Register"}
+        </button>
+
+        {isSubmitting && (
+          <p className="auth-help">Free backend may take up to one minute to wake up.</p>
+        )}
 
         {errorMessage && <p className="auth-error">{errorMessage}</p>}
 

@@ -95,6 +95,11 @@
   cursor: pointer;
 }
 
+.auth-card button:disabled {
+  cursor: wait;
+  opacity: 0.75;
+}
+
 .auth-card span {
   color: yellow;
   cursor: pointer;
@@ -108,4 +113,26 @@
   color: white;
   margin: 0;
   padding: 10px;
+}
+
+.auth-help {
+  color: white;
+  font-size: 13px;
+  line-height: 1.4;
+  margin: 0;
+  opacity: 0.9;
+}
+
+@media (max-width: 480px) {
+  .auth-wrapper {
+    min-height: 100vh;
+    height: auto;
+    padding: 20px;
+  }
+
+  .auth-card {
+    width: 100%;
+    max-width: 360px;
+    padding: 28px 22px;
+  }
 }
