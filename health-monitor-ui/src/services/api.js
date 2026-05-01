@@ -77,6 +77,10 @@ const normalizeRecord = (record) => ({
 
 export const apiBaseUrl = API_BASE_URL;
 
+export const apiErrorMessage = (error, fallback = "Something went wrong") => {
+  return error?.response?.data?.message || error?.message || fallback;
+};
+
 export const imageUrl = (path) => {
   if (!path) return "";
   if (/^https?:\/\//i.test(path)) return path;
@@ -163,15 +167,10 @@ export const profileApi = {
   },
 
   async changePassword(payload) {
-    try {
-      const response = await client.put("/user/password", payload, {
-        headers: { "Content-Type": "application/json" }
-      });
-      return response.data;
-    } catch (error) {
-      if (!isBackendUnsupported(error)) throw error;
-      return { message: "Password change requires backend support." };
-    }
+    const response = await client.put("/user/password", payload, {
+      headers: { "Content-Type": "application/json" }
+    });
+    return response.data;
   }
 };
 

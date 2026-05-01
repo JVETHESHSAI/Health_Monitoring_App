@@ -1,48 +1,63 @@
 import React, { useState } from "react";
 import Layout from "../components/Layout";
 import "./Settings.css";
-import { profileApi } from "../services/api";
+import { apiErrorMessage, profileApi } from "../services/api";
 
 const Settings = () => {
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [status, setStatus] = useState("");
+  const [saving, setSaving] = useState(false);
 
   const handleChangePassword = async (e) => {
     e.preventDefault();
+    setStatus("");
+
+    if (newPassword.length < 4) {
+      setStatus("New password must be at least 4 characters.");
+      return;
+    }
 
     if (newPassword !== confirmPassword) {
-      alert("New passwords do not match");
+      setStatus("New passwords do not match.");
       return;
     }
 
     try {
+      setSaving(true);
       await profileApi.changePassword({
         oldPassword,
         newPassword
       });
 
-      alert("Password Updated Successfully");
+      setStatus("Password updated successfully. Use the new password next time you login.");
       setOldPassword("");
       setNewPassword("");
       setConfirmPassword("");
     } catch (error) {
-      alert("Password Update Failed");
+      setStatus(apiErrorMessage(error, "Password update failed."));
+    } finally {
+      setSaving(false);
     }
   };
 
   return (
     <Layout>
       <div className="settings-container">
-        <h2>Settings</h2>
+        <section className="settings-hero">
+          <p>Account security</p>
+          <h2>Settings</h2>
+          <span>Update your login password for this account.</span>
+        </section>
 
-        <div className="card">
+        <section className="settings-card">
           <h3>Change Password</h3>
 
           <form onSubmit={handleChangePassword}>
             <input
               type="password"
-              placeholder="Old Password"
+              placeholder="Current password"
               value={oldPassword}
               onChange={(e) => setOldPassword(e.target.value)}
               required
@@ -50,7 +65,7 @@ const Settings = () => {
 
             <input
               type="password"
-              placeholder="New Password"
+              placeholder="New password"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
               required
@@ -58,17 +73,19 @@ const Settings = () => {
 
             <input
               type="password"
-              placeholder="Confirm New Password"
+              placeholder="Confirm new password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
             />
 
-            <button type="submit" className="save-btn">
-              Update Password
+            {status && <p className="settings-status">{status}</p>}
+
+            <button type="submit" className="save-btn" disabled={saving}>
+              {saving ? "Updating..." : "Update Password"}
             </button>
           </form>
-        </div>
+        </section>
       </div>
     </Layout>
   );
